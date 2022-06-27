@@ -1,0 +1,10 @@
+FileName	treatment	Experiment
+Control_D1.CEL	0 μM of 5-Aza	1
+Control_D2.CEL	0 μM of 5-Aza	2
+Control_D3.CEL	0 μM of 5-Aza	3
+Medium_A1.CEL	5 μM of 5-Aza	1
+Medium_A2.CEL	5 μM of 5-Aza	2
+Medium_A3.CEL	5 μM of 5-Aza	3
+High_B2.CEL	10 μM of 5-Aza	1
+High_B4.CEL	10 μM of 5-Aza	2
+High_B5.CEL	10 μM of 5-Aza	3

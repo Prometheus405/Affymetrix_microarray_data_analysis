@@ -1,0 +1,51 @@
+library(limma)
+library(affy)
+library(hgu133plus2.db)
+library(annotate)
+
+#The data files are contained in the extdata directory:
+datadir = dir()
+
+targets = readTargets(file ='Targets.txt', path = NULL, sep='\t', row.name='FileName')
+targets
+
+#Background correcting; Normalizing; Calculating Expression
+ab <- ReadAffy(filenames=targets$FileName, celfile.path=NULL)
+eset <- rma(ab)
+dim(eset)
+plotMDS(eset)
+
+#add gene symbols to the data object
+ID <- featureNames(eset)
+Symbol <- getSYMBOL(ID,"hgu133plus2.db")
+fData(eset) <- data.frame(Symbol=Symbol)
+fData(eset)
+
+#We remove all probes that do not have an Entrez Gene ID and Symbol:
+HasSymbol <- !is.na(fData(eset)$Symbol)
+eset <- eset[HasSymbol,]
+dim(eset)
+plotMDS(eset)
+
+#Differential expression
+Exp <- factor(targets$Experiment)
+treatment <- factor(targets$treatment, levels=c("0 μM of 5-Aza","5 μM of 5-Aza", "10 μM of 5-Aza"))
+design <- model.matrix(~treatment)
+
+#fitting 
+fit <- lmFit(eset, design)
+fit <- eBayes(fit, trend=TRUE, robust=TRUE)
+results <- decideTests(fit)
+summary(results)
+
+
+#topTable 
+topTable_5μM = topTable(fit, coef="treatment5 μM of 5-Aza", n=10)
+topTable_10μM = topTable(fit, coef="treatment10 μM of 5-Aza", n=10)
+
+#MD plot 
+plotMD_5μM = plotMD(fit, coef="treatment5 μM of 5-Aza", status=results)
+abline(0,0,col="green")
+
+plotMD_10μM = plotMD(fit, coef="treatment10 μM of 5-Aza", status=results)
+abline(0,0,col="green")
